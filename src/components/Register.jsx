@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+} from "firebase/auth";
 import auth from "../firebase/firebase.config";
 import { useState } from "react";
 import { IoMdEye, IoIosEyeOff } from "react-icons/io";
@@ -13,6 +17,8 @@ const Register = () => {
     const emailValue = e.target.email.value;
     const passValue = e.target.password.value;
     const termsValue = e.target.terms.checked;
+    const nameValue = e.target.name.value;
+    console.log(nameValue);
     setError("");
     setSuccess("");
 
@@ -26,10 +32,26 @@ const Register = () => {
       setError("Accept our Terms & Conditions");
       return;
     }
+    //create user
     createUserWithEmailAndPassword(auth, emailValue, passValue)
       .then((result) => {
         setSuccess("Created successfully");
         console.log(result.user);
+
+        //update profile
+        updateProfile(result.user, {
+          displayName: nameValue,
+          photoURL: "https://example.com/jane-q-user/profile.jpg",
+        })
+        .then(()=>{
+          console.log('Profile updated');
+        })
+        .catch((error)=>console.log(error.message))
+        
+        //send verification
+        sendEmailVerification(result.user).then(() => {
+          alert("Email verification sent!");
+        });
       })
       .catch((error) => {
         setError(error.message);
@@ -45,6 +67,16 @@ const Register = () => {
           <form onSubmit={handleFormSubmit} className="flex w-[30%] flex-col">
             <div>
               <input
+                className="py-2 mb-4 border w-full border-secondary px-4"
+                type="text"
+                name="name"
+                id="em"
+                placeholder="Name"
+                required
+              />
+            </div>
+            <div>
+              <input
                 className="py-2 border w-full border-secondary px-4"
                 type="email"
                 name="email"
@@ -53,6 +85,7 @@ const Register = () => {
                 required
               />
             </div>
+
             <div className="relative">
               <input
                 className="my-5 w-full py-2 border border-secondary px-4"

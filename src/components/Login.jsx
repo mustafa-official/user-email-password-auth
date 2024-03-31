@@ -18,8 +18,13 @@ const Login = () => {
     setSuccess("");
     signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
-        setSuccess("Log in successfully");
-        console.log(result.user);
+        if (result.user.emailVerified) {
+          setSuccess("Log in successfully");
+          console.log(result.user);
+        }
+        else{
+          alert("Please verify email")
+        }
       })
       .catch((error) => {
         setError(error.message);
@@ -40,10 +45,10 @@ const Login = () => {
     }
 
     sendPasswordResetEmail(auth, email)
-    .then(()=>{
-      alert('Please check your email')
-    })
-    .catch(error=>console.log(error))
+      .then(() => {
+        alert("Please check your email");
+      })
+      .catch((error) => console.log(error));
   };
   return (
     <div className="hero min-h-screen bg-base-200">
